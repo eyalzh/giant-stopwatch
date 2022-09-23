@@ -27,6 +27,9 @@ const App: Component = () => {
         resumeWatch();
       }
     }
+    if (e.key === "r") {
+      resetWatch();
+    }
   };
 
   const startTimer = () => {
@@ -101,9 +104,10 @@ const App: Component = () => {
           Reset
         </button>
       </section>
-      <section class="text-xs text-zinc-300">
-        Click 'space' to start, stop or resume the watch
-      </section>
+      <ul class="text-xs text-zinc-300">
+        <li>Click 'space' to start, stop or resume the watch</li>
+        <li>Click 'r' to reset the watch</li>
+      </ul>
     </header>
   );
 };
