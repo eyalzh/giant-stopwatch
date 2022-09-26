@@ -10,6 +10,7 @@ import {
 import { createStore } from "solid-js/store";
 import { LapTime } from "./components/LapList";
 import { zeroPadNum } from "./formatUtils";
+import { startSpeechRcognition, stopSpeechRecognition } from "./speech";
 import { speakMinutes } from "./timeSpeechUtils";
 
 const App: Component = () => {
@@ -20,10 +21,17 @@ const App: Component = () => {
   onCleanup(() => {
     clearTimerIfExists();
     document.body.removeEventListener("keydown", handleOnKeyDown);
+    stopSpeechRecognition();
   });
 
   onMount(() => {
     document.body.addEventListener("keydown", handleOnKeyDown);
+    startSpeechRcognition((command) => {
+      console.log(command);
+      if (command === "go") {
+        startWatch();
+      }
+    });
   });
 
   createEffect(() => {
