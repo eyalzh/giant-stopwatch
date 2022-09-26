@@ -5,13 +5,17 @@ import {
   onCleanup,
   onMount,
   createMemo,
+  Show,
 } from "solid-js";
+import { createStore } from "solid-js/store";
+import { LapTime } from "./components/LapList";
 import { zeroPadNum } from "./formatUtils";
 import { speakMinutes } from "./timeSpeechUtils";
 
 const App: Component = () => {
   const [timePassedMs, setTimePassedMs] = createSignal(0);
   const [stopped, setStopped] = createSignal(true);
+  const [lapTimes, setLapTimes] = createStore<Array<LapTime>>([]);
 
   onCleanup(() => {
     clearTimerIfExists();
@@ -45,13 +49,16 @@ const App: Component = () => {
     if (e.key === "r") {
       resetWatch();
     }
+    if (e.key === "l") {
+      lapTime();
+    }
   };
 
   const startTimer = () => {
     clearTimerIfExists();
     timer = setInterval(
       () => setTimePassedMs(performance.now() - startFromTime),
-      100
+      50
     );
   };
 
@@ -82,6 +89,22 @@ const App: Component = () => {
     startFromTime = performance.now();
   };
 
+  const lapTime = () => {
+    setLapTimes((prev) => [
+      ...prev,
+      {
+        seconds: seconds(),
+        minutes: minutes(),
+        hours: hours(),
+        deciseconds: deciseconds(),
+      },
+    ]);
+  };
+
+  const deciseconds = createMemo<number>(() => {
+    return Math.floor((timePassedMs() / 100) % 10);
+  });
+
   const seconds = createMemo<number>(() => {
     return Math.floor((timePassedMs() / 1000) % 60);
   });
@@ -94,13 +117,23 @@ const App: Component = () => {
     return Math.floor(timePassedMs() / 3600000);
   });
 
+  const lastLap = createMemo(() => {
+    return lapTimes[lapTimes.length - 1];
+  });
+
   return (
-    <header class="p-4 flex flex-col bg-slate-500 h-screen text-zinc-50 gap-5 select-none">
-      <section class="text-[20vw] leading-none self-center">
-        {zeroPadNum(hours(), 2)}:{zeroPadNum(minutes(), 2)}:
-        {zeroPadNum(seconds(), 2)}
-      </section>
-      <section class="flex gap-3">
+    <header class="p-4 flex flex-col bg-slate-500 h-screen text-zinc-50 gap-5 select-none pt-8">
+      <div class="text-[20vw] leading-none self-center relative">
+        <Show when={lapTimes.length > 0}>
+          <div class="absolute -top-4 text-xl">
+            LAP {lastLap().hours}:{zeroPadNum(lastLap().minutes, 2)}:
+            {zeroPadNum(lastLap().seconds, 2)}:{lastLap().deciseconds}
+          </div>
+        </Show>
+        {hours}:{zeroPadNum(minutes(), 2)}:{zeroPadNum(seconds(), 2)}
+        <span class="text-[3vw]">{deciseconds}</span>
+      </div>
+      <div class="flex gap-3">
         {timePassedMs() == 0 && stopped() ? (
           <button class="primary-btn" onClick={startWatch}>
             Start
@@ -119,9 +152,13 @@ const App: Component = () => {
         <button class="primary-btn" onClick={resetWatch}>
           Reset
         </button>
-      </section>
-      <ul class="text-xs text-zinc-300">
+        <button class="primary-btn" onClick={lapTime}>
+          Lap
+        </button>
+      </div>
+      <ul class="text-sm text-zinc-300">
         <li>Click 'space' to start, stop or resume the watch</li>
+        <li>Click 'l' to lap</li>
         <li>Click 'r' to reset the watch</li>
       </ul>
     </header>
