@@ -3,16 +3,23 @@ import {
   createEffect,
   createSignal,
   onCleanup,
-  onMount,
   createMemo,
   Show,
+  onMount,
+  Accessor,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { zeroPadNum } from "../formatUtils";
 import { speakMinutes } from "../timeSpeechUtils";
 import { LapTime } from "./LapList";
 
-export const StopWatch: Component = () => {
+interface StopWatchProps {
+  id: number;
+  selectedWatch: Accessor<number>;
+  onClick: () => void;
+}
+
+export const StopWatch: Component<StopWatchProps> = ({id, selectedWatch, onClick}) => {
   const [timePassedMs, setTimePassedMs] = createSignal(0);
   const [stopped, setStopped] = createSignal(true);
   const [lapTimes, setLapTimes] = createStore<Array<LapTime>>([]);
@@ -26,18 +33,9 @@ export const StopWatch: Component = () => {
     document.body.addEventListener("keydown", handleOnKeyDown);
   });
 
-  createEffect(() => {
-    if (minutes() > 0) {
-      speakMinutes(minutes());
-    }
-  });
-
-  let timer: number | null = null;
-  let startFromTime = 0;
-
   const handleOnKeyDown = (e: KeyboardEvent) => {
-    e.preventDefault();
-    if (e.code === "Space") {
+    if (e.code === "Space" && selectedWatch() === id) {
+      e.preventDefault();
       if (timePassedMs() == 0 && stopped()) {
         startWatch();
       } else if (!stopped()) {
@@ -46,13 +44,16 @@ export const StopWatch: Component = () => {
         resumeWatch();
       }
     }
-    if (e.key === "r") {
-      resetWatch();
-    }
-    if (e.key === "l") {
-      lapTime();
-    }
   };
+
+  createEffect(() => {
+    if (minutes() > 0) {
+      speakMinutes(minutes());
+    }
+  });
+
+  let timer: number | null = null;
+  let startFromTime = 0;
 
   const startTimer = () => {
     clearTimerIfExists();
@@ -122,7 +123,11 @@ export const StopWatch: Component = () => {
   });
 
   return (
-    <header class="flex flex-col text-zinc-50 gap-6 select-none pt-8 grow shadow-lg bg-slate-400 m-2 p-2 justify-between ">
+    <div
+      class={`flex flex-col border-box text-zinc-50 gap-6 select-none pt-8 grow shadow-xl border-8 border-solid  ${selectedWatch() === id ? "border-slate-800" : "border-slate-400"}  bg-slate-400 rounded  m-2 p-2 justify-between relative`} 
+      onClick={onClick}
+    >
+      <div class="absolute top-0 left-0 p-2 text-[1vw] bg-slate-500 rounded m-2">#{id}</div>
       <div class="text-[10vw] leading-none self-center relative">
         <Show when={lapTimes.length > 0}>
           <div class="absolute -top-4 text-xl">
@@ -157,6 +162,6 @@ export const StopWatch: Component = () => {
         </button>
       </div>
 
-    </header>
+    </div>
   );
 };
