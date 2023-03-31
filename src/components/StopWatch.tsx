@@ -7,6 +7,7 @@ import {
   Show,
   onMount,
   Accessor,
+  on,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { zeroPadNum } from "../formatUtils";
@@ -46,11 +47,11 @@ export const StopWatch: Component<StopWatchProps> = ({id, selectedWatch, onClick
     }
   };
 
-  createEffect(() => {
-    if (minutes() > 0) {
-      speakMinutes(minutes());
+  createEffect(on(() => minutes(), (minutes) => {
+    if (minutes > 0 && selectedWatch() === id) {
+      speakMinutes(minutes);
     }
-  });
+  }));
 
   let timer: number | null = null;
   let startFromTime = 0;
