@@ -4,6 +4,6 @@
 
 @layer components {
   .primary-btn {
-    @apply h-10 px-6 text-xl font-semibold rounded-md bg-slate-600 text-zinc-100;
+    @apply h-10 px-6 text-xl font-semibold rounded-md bg-slate-700 text-zinc-300;
   }
 }

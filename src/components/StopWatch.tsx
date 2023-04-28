@@ -125,10 +125,12 @@ export const StopWatch: Component<StopWatchProps> = ({id, selectedWatch, onClick
 
   return (
     <div
-      class={`flex flex-col border-box text-zinc-50 gap-6 select-none pt-8 grow shadow-xl border-8 border-solid  ${selectedWatch() === id ? "border-slate-800" : "border-slate-400"}  bg-slate-400 rounded  m-2 p-2 justify-between relative`} 
+      class={`flex flex-col border-box text-zinc-200 gap-6 select-none pt-8 grow shadow-xl border-8 border-solid  
+      ${selectedWatch() === id ? "border-slate-900" : "border-slate-500"} 
+       bg-slate-500 rounded  m-2 p-2 justify-between relative`} 
       onClick={onClick}
     >
-      <div class="absolute top-0 left-0 p-2 text-[1vw] bg-slate-500 rounded m-2">#{id}</div>
+      <div class="absolute top-0 left-0 p-2 text-[1vw] bg-slate-600 rounded m-2">#{id}</div>
       <div class="text-[10vw] leading-none self-center relative">
         <Show when={lapTimes.length > 0}>
           <div class="absolute -top-4 text-xl">

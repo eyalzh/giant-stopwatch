@@ -15,7 +15,7 @@ const App: Component = () => {
   const range = Array.from(Array(stopWatchCount).keys(), (n) => n + 1);
 
   return (
-    <div class="flex flex-col gap-30-px bg-slate-500 h-screen w-screen justify-start">
+    <div class="flex flex-col gap-30-px bg-slate-600 h-screen w-screen justify-start">
       <div class="flex gap-20-px justify-between h-full flex-wrap">
 
       <For each={range}>
